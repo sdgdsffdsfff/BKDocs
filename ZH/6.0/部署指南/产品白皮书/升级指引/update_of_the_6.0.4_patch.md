@@ -28,7 +28,7 @@ cd /data/src; grep . */*VERSION */*/VERSION
 
 1.下载相关产品包。请前往 [蓝鲸官网下载页-版本列表](https://bk.tencent.com/download_version_list/) 下载。
 
-- patch 包：bkce_patch_6.0.3-6.0.4.tgz
+- patch 包：[bkce_patch_6.0.3-6.0.4.tgz](https://bkopen-1252002024.file.myqcloud.com/ce/bkce_patch_6.0.3-6.0.4.tgz)
 
 2.将相关产品包上传至服务器 /data 目录。
 
@@ -157,7 +157,7 @@ curl http://bkiam.service.consul:5001/version | jq .version
 **注意：** 在此之前，必须将权限中心升级至指定中间版本，如未升级，请勿升级继续向下操作。
 
 ```bash
-./bkcli install saas-o bk_iam==1.4.23
+./bkcli install saas-o bk_iam==1.4.24
 ./bkcli upgrade bkiam
 ```
 
@@ -251,12 +251,10 @@ ssh $BK_LOG_IP "yum -y install mysql-devel"
 source /data/install/utils.fc
 
 # appo 环境
-ssh $BK_APPO_IP
-docker images | grep "none" | grep -v grep | awk '{print $3}' | xargs -n1 docker rmi
+pcmd -m appo "docker image prune  -f "
 
 # appt 环境
-ssh $BK_APPT_IP
-docker images | grep "none" | grep -v grep | awk '{print $3}' | xargs -n1 docker rmi
+pcmd -m appt "docker image prune  -f "
 ```
 
 ### 刷新版本信息
@@ -268,6 +266,12 @@ _update_common_info
 
 ## 升级后操作
 
+- 禁用 mysqld.service 服务，避免服务器重启后无法拉起蓝鲸使用的 mysql@default.service 服务
+
+```bash
+cd /data/install
+./pcmd.sh -m mysql "systemctl disable mysqld.service"
+```
 
 - 请前往配置平台修改蓝鲸业务下的 gse_btsvr 服务模版
 
